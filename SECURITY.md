@@ -2,7 +2,7 @@
 
 Please do not disclose vulnerabilities in a public issue. Contact the repository maintainer privately and include affected versions, reproduction steps, and potential impact.
 
-Before deploying TicketFlow Community:
+Before deploying Ticket Kanban:
 
 - Set a long random `SECRET_KEY`.
 - Serve the application through HTTPS.

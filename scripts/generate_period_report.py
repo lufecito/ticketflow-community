@@ -34,7 +34,7 @@ def header_footer(canvas, doc):
     width, height = landscape(A4)
     canvas.setFillColor(colors.HexColor('#9AA3AF'))
     canvas.setFont('Helvetica', 7.5)
-    canvas.drawString(15*mm, height-10*mm, os.getenv('REPORT_HEADER', 'TicketFlow Community | Internal report'))
+    canvas.drawString(15*mm, height-10*mm, os.getenv('REPORT_HEADER', 'Ticket Kanban | Internal report'))
     canvas.setStrokeColor(colors.HexColor('#D8DEE7'))
     canvas.line(15*mm, height-13*mm, width-15*mm, height-13*mm)
     canvas.setFont('Helvetica', 7)
@@ -104,7 +104,7 @@ def main():
     styles=getSampleStyleSheet()
     styles.add(ParagraphStyle(name='SmallCell',parent=styles['BodyText'],fontSize=6.5,leading=8,textColor=colors.HexColor('#243145')))
     styles.add(ParagraphStyle(name='TitleOT',parent=styles['Title'],fontSize=20,leading=24,textColor=colors.HexColor('#14213D')))
-    doc=SimpleDocTemplate(str(pdf_path),pagesize=landscape(A4),leftMargin=15*mm,rightMargin=15*mm,topMargin=20*mm,bottomMargin=15*mm,title=f'Informe de Gestión {start:%d/%m/%Y} - {end:%d/%m/%Y}',author='TicketFlow contributors')
+    doc=SimpleDocTemplate(str(pdf_path),pagesize=landscape(A4),leftMargin=15*mm,rightMargin=15*mm,topMargin=20*mm,bottomMargin=15*mm,title=f'Informe de Gestión {start:%d/%m/%Y} - {end:%d/%m/%Y}',author='Ticket Kanban contributors')
     story=[Paragraph('Informe automático de Gestión TI',styles['TitleOT']),Paragraph(f'Período: {start:%d/%m/%Y} (inclusive) al {end:%d/%m/%Y} (exclusivo)',styles['Heading2']),Spacer(1,4*mm)]
     summary=[['Recibidos','Resueltos','Pendientes al corte','Horas efectivas','Valor estimado','SLA atención','SLA resolución'],[len(received),len(resolved),pending,f'{hours:.2f}',f'${value:,.0f}'.replace(',','.'),f'{sla_first}%' if sla_first is not None else '-',f'{sla_resolution}%' if sla_resolution is not None else '-']]
     st=Table(summary,colWidths=[35*mm]*7)

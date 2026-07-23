@@ -73,7 +73,7 @@ def create_app(config):
 
     @app.context_processor
     def inject_branding():
-        return {'app_name': app.config.get('APP_NAME', 'TicketFlow Community')}
+        return {'app_name': app.config.get('APP_NAME', 'Ticket Kanban')}
 
     return app
 

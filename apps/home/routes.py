@@ -435,7 +435,7 @@ def usuario_eliminar(usuario_id):
 @admin_required
 def configuracion():
     config = {
-        'nombre_empresa': 'TicketFlow Community',
+        'nombre_empresa': 'Ticket Kanban',
         'correo': '',
         'telefono': '',
         'tema': 'CoreUI',

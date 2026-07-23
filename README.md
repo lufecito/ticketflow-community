@@ -1,6 +1,6 @@
-# TicketFlow Community
+# Ticket Kanban
 
-TicketFlow Community is an open-source service desk and IT operations dashboard built with Flask and CoreUI. It supports customer tickets, internal support requests, SLA tracking, IT asset governance, 15-to-15 reporting periods, light/dark themes, and optional Google sign-in.
+Ticket Kanban is an open-source service desk and IT operations dashboard built with Flask and CoreUI. It supports customer tickets, internal support requests, SLA tracking, IT asset governance, 15-to-15 reporting periods, light/dark themes, and optional Google sign-in.
 
 This repository is a clean community edition. It contains no production database, customer records, private reports, credentials, deployment backups, or organization-specific branding.
 
@@ -101,7 +101,7 @@ python scripts/generate_period_report.py --start 2026-06-15
 
 ## License and attribution
 
-Released under the MIT License. The original dashboard foundation is copyright AppSeed; later TicketFlow Community modifications are distributed under the same license. See [LICENSE](LICENSE).
+Released under the MIT License. The original dashboard foundation is copyright AppSeed; later Ticket Kanban modifications are distributed under the same license. See [LICENSE](LICENSE).
 
 ## Contributing
 

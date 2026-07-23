@@ -11,7 +11,7 @@ class Config(object):
 
     # Assets Management
     ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')
-    APP_NAME = os.getenv('APP_NAME', 'TicketFlow Community')
+    APP_NAME = os.getenv('APP_NAME', 'Ticket Kanban')
 
     # Google OAuth2
     GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', None)

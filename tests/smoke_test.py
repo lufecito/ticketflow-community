@@ -12,7 +12,7 @@ with tempfile.TemporaryDirectory() as temporary_directory:
     os.environ["DEBUG"] = "True"
     os.environ["SECRET_KEY"] = "automated-test-secret"
     os.environ["SQLITE_PATH"] = str(database_path)
-    os.environ["APP_NAME"] = "TicketFlow Community"
+    os.environ["APP_NAME"] = "Ticket Kanban"
 
     from run import app
     from apps import db
@@ -33,7 +33,7 @@ with tempfile.TemporaryDirectory() as temporary_directory:
     client = app.test_client()
     login_page = client.get("/login")
     assert login_page.status_code == 200
-    assert b"TicketFlow" in login_page.data
+    assert b"Ticket Kanban" in login_page.data
 
     response = client.post("/login", data={
         "login": "1",
@@ -55,4 +55,4 @@ with tempfile.TemporaryDirectory() as temporary_directory:
         db.session.remove()
         db.engine.dispose()
 
-print("TicketFlow Community smoke test passed")
+print("Ticket Kanban smoke test passed")
