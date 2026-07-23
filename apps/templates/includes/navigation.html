@@ -1,0 +1,53 @@
+<header class="header header-sticky mb-4">
+  <div class="container-fluid">
+    <button class="header-toggler px-md-0 me-md-3" type="button" onclick="coreui.Sidebar.getInstance(document.querySelector('#sidebar')).toggle()">
+      <svg class="icon icon-lg">
+        <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-menu"></use>
+      </svg>
+    </button>
+    <a class="header-brand d-md-none fw-semibold text-decoration-none" href="{{ url_for('home_blueprint.index') }}">{{ app_name }}</a>
+    <ul class="header-nav d-none d-md-flex">
+      {% if current_user.rol in ['Administrador', 'Tecnico'] %}
+      <li class="nav-item"><a class="nav-link {% if segment == 'index' %}active{% endif %}" href="{{ url_for('home_blueprint.index') }}">Dashboard</a></li>
+      <li class="nav-item"><a class="nav-link {% if segment == 'tickets' %}active{% endif %}" href="{{ url_for('home_blueprint.tickets') }}">Tickets Clientes</a></li>
+      <li class="nav-item"><a class="nav-link {% if segment == 'clientes' %}active{% endif %}" href="{{ url_for('home_blueprint.clientes') }}">Clientes</a></li>
+      {% endif %}
+      <li class="nav-item"><a class="nav-link {% if segment == 'soporte_tickets' %}active{% endif %}" href="{{ url_for('home_blueprint.soporte_tickets') }}">Soporte TI</a></li>
+    </ul>
+    <ul class="header-nav ms-auto"></ul>
+    <ul class="header-nav ms-3">
+      <li class="nav-item dropdown">
+        <a class="nav-link py-0" data-coreui-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+          <div class="avatar avatar-md avatar-initial" aria-label="{{ current_user.email }}">{{ current_user.username[:1]|upper }}</div>
+        </a>
+        <div class="dropdown-menu dropdown-menu-end pt-0">
+          <div class="dropdown-header bg-light py-2">
+            <div class="fw-semibold">{{ current_user.username }}</div>
+          </div>
+          {% if current_user.rol == 'Administrador' %}
+          <a class="dropdown-item" href="{{ url_for('home_blueprint.configuracion') }}">
+            <svg class="icon me-2">
+              <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-settings"></use>
+            </svg> Configuracion
+          </a>
+          {% endif %}
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{{ url_for('authentication_blueprint.logout') }}">
+            <svg class="icon me-2">
+              <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-account-logout"></use>
+            </svg> Salir
+          </a>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="header-divider"></div>
+  <div class="container-fluid">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb my-0 ms-2">
+        <li class="breadcrumb-item"><span>{{ app_name }}</span></li>
+        <li class="breadcrumb-item active"><span>{{ segment|default('dashboard')|capitalize }}</span></li>
+      </ol>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,118 @@
+{% extends "layouts/base-fullscreen.html" %}
+
+{% block title %}Acceso{% endblock %}
+
+{% block stylesheets %}
+<link href="/static/assets/css/login.css?v=20260721-login-redesign" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block content %}
+<main class="auth-page">
+  <div class="auth-glow auth-glow-one"></div>
+  <div class="auth-glow auth-glow-two"></div>
+
+  <div class="auth-shell">
+    <section class="auth-intro" aria-labelledby="platform-title">
+      <a class="auth-brand" href="/" aria-label="{{ app_name }}">
+        <svg class="auth-brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M24 3 42 13.5v21L24 45 6 34.5v-21L24 3Z"/>
+          <path d="m24 12 10 5.8v11.5L24 35l-10-5.7V17.8L24 12Z"/>
+          <path d="m14 17.8 10 5.8 10-5.8M24 23.6V35"/>
+        </svg>
+        <span>TicketFlow <b>Community</b></span>
+      </a>
+
+      <div class="auth-intro-copy">
+        <span class="auth-eyebrow">Service Desk</span>
+        <h1 id="platform-title">Gestión TI clara,<br>ordenada y medible.</h1>
+        <p>Administra tickets, activos, niveles de servicio y reportes operacionales desde un único espacio de trabajo.</p>
+      </div>
+
+      <div class="auth-preview" aria-hidden="true">
+        <div class="preview-topbar"><i></i><span></span><span></span><b></b></div>
+        <div class="preview-grid">
+          <div class="preview-side"><i></i><i></i><i></i><i></i></div>
+          <div class="preview-main">
+            <div class="preview-chart">
+              <span class="chart-line line-a"></span><span class="chart-line line-b"></span>
+              <svg viewBox="0 0 260 90" preserveAspectRatio="none"><path d="M2 77 C30 68, 43 75, 66 54 S105 65, 132 42 S173 53, 202 25 S238 30, 258 9"/></svg>
+            </div>
+            <div class="preview-metrics"><i></i><i></i><i></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-trust">
+        <span><i></i> Seguimiento de SLA</span>
+        <span><i></i> Gobierno TI</span>
+        <span><i></i> Reportes 15 a 15</span>
+      </div>
+    </section>
+
+    <section class="auth-card" aria-labelledby="login-title">
+      <div class="auth-card-inner">
+        <header class="auth-card-header">
+          <span class="auth-eyebrow">Acceso seguro</span>
+          <h2 id="login-title">Bienvenido de vuelta</h2>
+          <p>{% if msg %}{{ msg | safe }}{% else %}Ingresa tus credenciales para continuar{% endif %}</p>
+        </header>
+
+        <form role="form" method="post" action="" class="auth-form">
+          {{ form.hidden_tag() }}
+          <div class="auth-field">
+            <label for="{{ form.username.id }}">Usuario</label>
+            <div class="auth-input-wrap">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg>
+              {{ form.username(placeholder="Ingresa tu usuario", class="auth-input", autocomplete="username") }}
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <label for="{{ form.password.id }}">Contraseña</label>
+            <div class="auth-input-wrap">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+              {{ form.password(placeholder="Ingresa tu contraseña", class="auth-input auth-password", type="password", autocomplete="current-password") }}
+              <button class="password-toggle" type="button" aria-label="Mostrar contraseña" aria-pressed="false">
+                <svg class="eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <button class="auth-submit" type="submit" name="login">
+            <span>Ingresar</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
+          </button>
+        </form>
+
+        <div class="auth-divider"><span>o continúa con</span></div>
+
+        <a class="auth-google" href="{{ url_for('authentication_blueprint.google_login') }}">
+          <span class="google-mark">G</span>
+          <span>Continuar con Google</span>
+        </a>
+
+        <footer class="auth-card-footer">
+          <span class="security-dot"></span>
+          Conexión protegida · {{ app_name }}
+        </footer>
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+  (function () {
+    var toggle = document.querySelector('.password-toggle');
+    var input = document.querySelector('.auth-password');
+    if (!toggle || !input) return;
+    toggle.addEventListener('click', function () {
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      toggle.setAttribute('aria-pressed', show ? 'true' : 'false');
+      toggle.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    });
+  }());
+</script>
+{% endblock javascripts %}

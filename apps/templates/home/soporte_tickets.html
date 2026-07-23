@@ -1,0 +1,169 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Soporte TI{% endblock %}
+
+{% block content %}
+<div class="body flex-grow-1 px-3">
+  <div class="container-lg">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row gap-3 justify-content-between align-items-md-center mb-4">
+      <div>
+        <h1 class="h3 mb-1 text-dark">Tickets de Soporte TI</h1>
+        <p class="text-medium-emphasis mb-0">
+          {% if current_user.rol in ['Usuario', 'Cliente'] %}
+          Gestiona tus tickets de soporte técnico e incidentes.
+          {% else %}
+          Administración y resolución de incidentes de soporte del sistema.
+          {% endif %}
+        </p>
+      </div>
+      <a class="btn btn-primary d-inline-flex align-items-center gap-2" href="{{ url_for('home_blueprint.soporte_ticket_nuevo') }}">
+        <svg class="icon">
+          <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-plus"></use>
+        </svg>
+        Crear Ticket de Soporte
+      </a>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="card mb-4 shadow-sm border-0">
+      <div class="card-body p-4">
+        <form method="get" class="row g-3">
+          <!-- Text Search -->
+          <div class="col-md-4">
+            <label class="form-label">Buscar</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0 text-muted">
+                <svg class="icon"><use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-search"></use></svg>
+              </span>
+              <input class="form-control bg-light border-start-0" name="buscar" value="{{ filtros.get('buscar', '') }}" placeholder="Número o asunto...">
+            </div>
+          </div>
+
+          <!-- Estado Filter -->
+          <div class="col-md-2">
+            <label class="form-label">Estado</label>
+            <select class="form-select bg-light" name="estado">
+              <option value="">Todos</option>
+              {% for est in estados_soporte %}
+              <option value="{{ est }}" {% if filtros.get('estado') == est %}selected{% endif %}>{{ est }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Prioridad Filter -->
+          <div class="col-md-2">
+            <label class="form-label">Prioridad</label>
+            <select class="form-select bg-light" name="prioridad">
+              <option value="">Todas</option>
+              {% for prio in prioridades %}
+              <option value="{{ prio }}" {% if filtros.get('prioridad') == prio %}selected{% endif %}>{{ prio }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- User Filter (Admin Only) -->
+          {% if current_user.rol == 'Administrador' %}
+          <div class="col-md-2">
+            <label class="form-label">Usuario</label>
+            <select class="form-select bg-light" name="usuario_id">
+              <option value="">Todos</option>
+              {% for u in usuarios %}
+              <option value="{{ u.id }}" {% if filtros.get('usuario_id', '')|int == u.id %}selected{% endif %}>{{ u.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
+
+          <!-- Date Filter -->
+          <div class="col-md-2">
+            <label class="form-label">Fecha Creación</label>
+            <input class="form-control bg-light" type="date" name="fecha" value="{{ filtros.get('fecha', '') }}">
+          </div>
+
+          <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+            <a href="{{ url_for('home_blueprint.soporte_tickets') }}" class="btn btn-outline-secondary">Limpiar</a>
+            <button class="btn btn-primary px-4" type="submit">Filtrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card mb-4 shadow-sm border-0">
+      <div class="card-body p-4">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Número</th>
+                <th>Asunto</th>
+                <th>Categoría</th>
+                <th>Prioridad</th>
+                <th>Estado</th>
+                {% if current_user.rol not in ['Usuario', 'Cliente'] %}
+                <th>Creado Por</th>
+                {% endif %}
+                <th>Responsable</th>
+                <th>Fecha de Creación</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ticket in tickets %}
+              <tr>
+                <td><span class="fw-semibold text-primary">{{ ticket.numero }}</span></td>
+                <td><span class="fw-semibold text-dark">{{ ticket.asunto }}</span></td>
+                <td><span class="small text-medium-emphasis">{{ ticket.categoria }}</span></td>
+                <td>
+                  {% if ticket.prioridad == 'Baja' %}
+                  <span class="badge badge-prioridad-baja">Baja</span>
+                  {% elif ticket.prioridad == 'Media' %}
+                  <span class="badge badge-prioridad-media">Media</span>
+                  {% elif ticket.prioridad == 'Alta' %}
+                  <span class="badge badge-prioridad-alta">Alta</span>
+                  {% else %}
+                  <span class="badge badge-prioridad-critica">Crítica</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if ticket.estado == 'Abierto' %}
+                  <span class="badge badge-estado-ingresado">Abierto</span>
+                  {% elif ticket.estado == 'En proceso' %}
+                  <span class="badge badge-estado-proceso">En proceso</span>
+                  {% elif ticket.estado == 'Resuelto' %}
+                  <span class="badge badge-estado-finalizado">Resuelto</span>
+                  {% else %}
+                  <span class="badge bg-light text-secondary">Cerrado</span>
+                  {% endif %}
+                </td>
+                {% if current_user.rol not in ['Usuario', 'Cliente'] %}
+                <td><span class="small">{{ ticket.usuario.nombre or '' }} ({{ ticket.usuario.username }})</span></td>
+                {% endif %}
+                <td>
+                  {% if ticket.tecnico %}
+                  <span class="small text-dark fw-medium">{{ ticket.tecnico.username }}</span>
+                  {% else %}
+                  <span class="text-muted small">Sin asignar</span>
+                  {% endif %}
+                </td>
+                <td><span class="small text-medium-emphasis">{{ ticket.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</span></td>
+                <td class="text-end">
+                  <a class="btn btn-sm btn-outline-primary" href="{{ url_for('home_blueprint.soporte_ticket_detalle', ticket_id=ticket.id) }}">
+                    Ver Detalle
+                  </a>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="{% if current_user.rol not in ['Usuario', 'Cliente'] %}9{% else %}8{% endif %}" class="text-center text-medium-emphasis py-4">No hay tickets de soporte registrados.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

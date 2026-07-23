@@ -1,0 +1,69 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ 'Editar Usuario' if usuario.id else 'Agregar Usuario' }}{% endblock %}
+
+{% block content %}
+<div class="body flex-grow-1 px-3">
+  <div class="container-lg">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="h3 mb-1 text-dark">{{ 'Editar Usuario' if usuario.id else 'Agregar Nuevo Usuario' }}</h1>
+        <p class="text-medium-emphasis mb-0">Llena la información de acceso y rol del técnico de soporte.</p>
+      </div>
+      <a class="btn btn-outline-secondary" href="{{ url_for('home_blueprint.usuarios') }}">
+        Volver a la Lista
+      </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card mb-4 shadow-sm border-0">
+      <div class="card-body p-4">
+        <form method="post">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nombre</label>
+              <input class="form-control" name="nombre" value="{{ usuario.nombre or '' }}" placeholder="Ej: Juan">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apellido</label>
+              <input class="form-control" name="apellido" value="{{ usuario.apellido or '' }}" placeholder="Ej: Pérez">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Correo Electrónico *</label>
+              <input class="form-control" type="email" name="email" value="{{ usuario.email or '' }}" placeholder="Ej: usuario@example.org" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Nombre de Usuario *</label>
+              <input class="form-control" name="username" value="{{ usuario.username or '' }}" placeholder="Ej: jperez" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Contraseña {% if usuario.id %}(Dejar en blanco para no modificar){% else %}*{% endif %}</label>
+              <input class="form-control" type="password" name="password" {% if not usuario.id %}required{% endif %} placeholder="Ingresa contraseña segura">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Rol del Sistema</label>
+              <select class="form-select" name="rol">
+                {% for rol in roles %}
+                <option value="{{ rol }}" {% if usuario.rol == rol %}selected{% endif %}>{{ rol }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 mt-4">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="activo" id="activo" {% if usuario.activo or not usuario.id %}checked{% endif %}>
+                <label class="form-check-label fw-medium text-dark" for="activo">Usuario Activo</label>
+                <div class="form-text">Los usuarios inactivos no pueden iniciar sesión ni recibir asignación de tickets.</div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 border-top pt-3 d-flex justify-content-end gap-2">
+            <a href="{{ url_for('home_blueprint.usuarios') }}" class="btn btn-outline-secondary">Cancelar</a>
+            <button class="btn btn-primary px-4" type="submit">Guardar Usuario</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

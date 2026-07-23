@@ -1,0 +1,44 @@
+{% extends "layouts/base.html" %}
+{% block title %}Tablero Kanban{% endblock %}
+{% block stylesheets %}<link href="/static/assets/css/kanban.css" rel="stylesheet">{% endblock stylesheets %}
+{% block content %}
+<div class="body flex-grow-1 px-3"><div class="container-fluid">
+  <div class="kanban-heading">
+    <div><span class="kanban-eyebrow">Gestión de tickets</span><h1 class="h3 mb-1">Tablero Kanban</h1><p class="text-medium-emphasis mb-0">Prioriza el trabajo y mueve cada ticket según su avance.</p></div>
+    <div class="d-flex align-items-center gap-2 flex-wrap"><span class="kanban-total"><strong id="kanban-visible-count">{{ total_tickets }}</strong> tickets</span><a class="btn btn-primary" href="{{ url_for('home_blueprint.ticket_form') }}">+ Nuevo ticket</a></div>
+  </div>
+  <div class="kanban-toolbar">
+    <label class="kanban-search"><span aria-hidden="true">⌕</span><input id="kanban-search" type="search" placeholder="Buscar por número, asunto o cliente"></label>
+    <select id="kanban-priority" class="form-select"><option value="">Todas las prioridades</option>{% for prioridad in prioridades %}<option value="{{ prioridad|lower }}">{{ prioridad }}</option>{% endfor %}</select>
+    <select id="kanban-owner" class="form-select"><option value="">Todos los responsables</option>{% for tecnico in tecnicos %}<option value="{{ tecnico.username|lower }}">{{ tecnico.username }}</option>{% endfor %}</select>
+    <button id="kanban-clear" class="btn btn-outline-secondary" type="button">Limpiar</button>
+  </div>
+  <div class="kanban-board" id="kanban-board">
+    {% for columna in columnas %}<section class="kanban-column kanban-column-{{ columna.id }}" data-status="{{ columna.estado_destino }}">
+      <header class="kanban-column-header"><div><span class="kanban-column-dot"></span><h2>{{ columna.titulo }}</h2></div><span class="kanban-column-count">{{ columna.tickets|length }}</span></header>
+      <div class="kanban-dropzone">
+        {% for ticket in columna.tickets %}<article class="kanban-card" draggable="true" data-ticket-id="{{ ticket.id }}" data-search="{{ (ticket.numero ~ ' ' ~ ticket.asunto ~ ' ' ~ (ticket.cliente.nombre if ticket.cliente else ''))|lower }}" data-priority="{{ ticket.prioridad|lower }}" data-owner="{{ (ticket.tecnico.username if ticket.tecnico else '')|lower }}">
+          <div class="kanban-card-topline"><a href="{{ url_for('home_blueprint.ticket_detalle', ticket_id=ticket.id) }}" class="kanban-ticket-key">{{ ticket.numero }}</a><span class="kanban-priority kanban-priority-{{ ticket.prioridad|lower }}">{{ ticket.prioridad }}</span></div>
+          <a href="{{ url_for('home_blueprint.ticket_detalle', ticket_id=ticket.id) }}" class="kanban-card-title">{{ ticket.asunto }}</a>
+          <div class="kanban-card-labels"><span>{{ ticket.categoria or 'Sin categoría' }}</span></div>
+          <div class="kanban-card-footer"><span>{{ ticket.cliente.nombre if ticket.cliente else 'Sin cliente' }}</span><span class="kanban-avatar">{{ (ticket.tecnico.username[:2] if ticket.tecnico else '—')|upper }}</span></div>
+        </article>{% endfor %}<div class="kanban-empty">Suelta aquí el ticket</div>
+      </div>
+    </section>{% endfor %}
+  </div>
+  <div id="kanban-toast" class="kanban-toast" role="status" aria-live="polite"></div>
+</div></div>
+{% endblock content %}
+{% block javascripts %}
+<script>
+(function(){
+ const board=document.getElementById('kanban-board'),search=document.getElementById('kanban-search'),priority=document.getElementById('kanban-priority'),owner=document.getElementById('kanban-owner'),toast=document.getElementById('kanban-toast');let dragged=null;
+ function counts(){let total=0;document.querySelectorAll('.kanban-column').forEach(c=>{const n=[...c.querySelectorAll('.kanban-card')].filter(x=>!x.hidden).length;c.querySelector('.kanban-column-count').textContent=n;total+=n});document.getElementById('kanban-visible-count').textContent=total}
+ function filter(){const term=search.value.trim().toLowerCase();document.querySelectorAll('.kanban-card').forEach(c=>c.hidden=!((!term||c.dataset.search.includes(term))&&(!priority.value||c.dataset.priority===priority.value)&&(!owner.value||c.dataset.owner===owner.value)));counts()}
+ function notify(message,error){toast.textContent=message;toast.classList.toggle('is-error',!!error);toast.classList.add('is-visible');setTimeout(()=>toast.classList.remove('is-visible'),2600)}
+ board.addEventListener('dragstart',e=>{dragged=e.target.closest('.kanban-card');if(dragged)dragged.classList.add('is-dragging')});board.addEventListener('dragend',()=>{if(dragged)dragged.classList.remove('is-dragging');document.querySelectorAll('.kanban-dropzone').forEach(z=>z.classList.remove('is-over'));dragged=null});
+ document.querySelectorAll('.kanban-dropzone').forEach(zone=>{zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('is-over')});zone.addEventListener('dragleave',()=>zone.classList.remove('is-over'));zone.addEventListener('drop',async e=>{e.preventDefault();zone.classList.remove('is-over');if(!dragged)return;const old=dragged.parentElement,status=zone.closest('.kanban-column').dataset.status;zone.prepend(dragged);counts();try{const response=await fetch(`/tablero-kanban/tickets/${dragged.dataset.ticketId}/estado`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({estado:status})}),result=await response.json();if(!response.ok||!result.ok)throw new Error(result.error||'No fue posible actualizar');notify(`${result.ticket} movido a ${result.estado}`)}catch(error){old.prepend(dragged);counts();notify(error.message,true)}})});
+ [search,priority,owner].forEach(x=>x.addEventListener('input',filter));document.getElementById('kanban-clear').addEventListener('click',()=>{search.value='';priority.value='';owner.value='';filter();search.focus()});counts();
+}());
+</script>
+{% endblock javascripts %}

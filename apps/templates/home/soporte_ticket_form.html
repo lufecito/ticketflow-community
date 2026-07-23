@@ -1,0 +1,73 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Crear Ticket de Soporte{% endblock %}
+
+{% block content %}
+<div class="body flex-grow-1 px-3">
+  <div class="container-lg">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="h3 mb-1 text-dark">Crear Nuevo Ticket de Soporte</h1>
+        <p class="text-medium-emphasis mb-0">Describe el problema o requerimiento técnico que presentas.</p>
+      </div>
+      <a class="btn btn-outline-secondary" href="{{ url_for('home_blueprint.soporte_tickets') }}">
+        Volver a la Lista
+      </a>
+    </div>
+
+    {% if msg %}
+    <div class="alert alert-danger shadow-sm border-0 mb-4" role="alert">
+      {{ msg }}
+    </div>
+    {% endif %}
+
+    <!-- Form Card -->
+    <div class="card mb-4 shadow-sm border-0">
+      <div class="card-body p-4">
+        <form method="post">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label">Asunto / Resumen Corto *</label>
+              <input class="form-control" name="asunto" placeholder="Ej: No puedo acceder a la plataforma de correos" required>
+            </div>
+            
+            <div class="col-md-4">
+              <label class="form-label">Categoría *</label>
+              <select class="form-select" name="categoria" required>
+                <option value="" disabled selected>Selecciona una categoría</option>
+                <option value="Soporte Técnico">Soporte Técnico</option>
+                <option value="Cuentas y Accesos">Cuentas y Accesos</option>
+                <option value="Facturación">Facturación</option>
+                <option value="Hardware">Hardware (Equipos, Pantallas, etc.)</option>
+                <option value="Software">Software (Aplicaciones, Licencias)</option>
+                <option value="Redes e Internet">Redes e Internet</option>
+                <option value="Otros">Otros</option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Prioridad *</label>
+              <select class="form-select" name="prioridad" required>
+                {% for prio in prioridades %}
+                <option value="{{ prio }}" {% if prio == 'Media' %}selected{% endif %}>{{ prio }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Descripción Detallada *</label>
+              <textarea class="form-control" name="descripcion" rows="6" placeholder="Describe los pasos detallados para reproducir el problema o la solicitud específica..." required></textarea>
+            </div>
+          </div>
+
+          <div class="mt-4 border-top pt-3 d-flex justify-content-end gap-2">
+            <a href="{{ url_for('home_blueprint.soporte_tickets') }}" class="btn btn-outline-secondary">Cancelar</a>
+            <button class="btn btn-primary px-4" type="submit">Enviar Ticket</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

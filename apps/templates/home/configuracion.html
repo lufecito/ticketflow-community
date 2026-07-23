@@ -1,0 +1,56 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Configuración{% endblock %}
+
+{% block content %}
+<div class="body flex-grow-1 px-3">
+  <div class="container-lg">
+    <!-- Header -->
+    <div class="mb-4">
+      <h1 class="h3 mb-1 text-dark">Configuración General</h1>
+      <p class="text-medium-emphasis">Ajusta los parámetros y datos de contacto de la organización.</p>
+    </div>
+
+    {% if guardado %}
+    <div class="alert alert-success border-0 shadow-sm mb-4 d-flex align-items-center gap-2" role="alert">
+      <svg class="icon text-success" style="width: 1.25rem; height: 1.25rem;">
+        <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-check-circle"></use>
+      </svg>
+      <div>Configuración guardada correctamente para esta sesión.</div>
+    </div>
+    {% endif %}
+
+    <!-- Form Card -->
+    <div class="card mb-4 shadow-sm border-0">
+      <div class="card-body p-4">
+        <form method="post">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nombre de la Empresa</label>
+              <input class="form-control" name="nombre_empresa" value="{{ config.nombre_empresa }}" placeholder="Ej: Mi organización">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Correo Electrónico de Contacto</label>
+              <input class="form-control" type="email" name="correo" value="{{ config.correo }}" placeholder="Ej: soporte@example.org">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Teléfono de Contacto</label>
+              <input class="form-control" name="telefono" value="{{ config.telefono }}" placeholder="Ej: +56 2 2345 6789">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Tema Visual</label>
+              <select class="form-select" name="tema">
+                <option value="CoreUI" {% if config.tema == 'CoreUI' %}selected{% endif %}>CoreUI (Claro)</option>
+                <option value="CoreUI Dark" {% if config.tema == 'CoreUI Dark' %}selected{% endif %}>CoreUI (Oscuro)</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-4 border-top pt-3 d-flex justify-content-end">
+            <button class="btn btn-primary px-4" type="submit">Guardar Configuración</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

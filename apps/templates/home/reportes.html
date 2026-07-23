@@ -1,0 +1,8 @@
+{% extends "layouts/base.html" %}
+{% block title %}Reportes 15 a 15{% endblock %}
+{% block content %}
+<div class="body flex-grow-1 px-3"><div class="container-lg">
+  <div class="d-flex justify-content-between align-items-center mb-4"><div><h1 class="h3 mb-1">Reportes automáticos</h1><p class="text-medium-emphasis mb-0">Cada ciclo se cierra el día 15. Se conserva una versión PDF y una planilla CSV.</p></div><a class="btn btn-outline-primary" href="{{ url_for('home_blueprint.index') }}">Ver indicadores</a></div>
+  <div class="card"><div class="card-body"><div class="table-responsive"><table class="table table-hover"><thead><tr><th>Archivo</th><th>Formato</th><th>Tamaño</th><th>Generado</th><th></th></tr></thead><tbody>{% for archivo in archivos %}<tr><td class="fw-semibold">{{ archivo.nombre }}</td><td><span class="badge bg-primary">{{ archivo.formato }}</span></td><td>{{ '%.1f'|format(archivo.tamano/1024) }} KB</td><td>{{ archivo.fecha.strftime('%d/%m/%Y %H:%M') }}</td><td class="text-end"><a class="btn btn-sm btn-primary" href="{{ url_for('home_blueprint.reporte_descargar',filename=archivo.nombre) }}">Descargar</a></td></tr>{% else %}<tr><td colspan="5" class="text-center text-medium-emphasis py-4">Aún no hay reportes generados.</td></tr>{% endfor %}</tbody></table></div></div></div>
+</div></div>
+{% endblock content %}

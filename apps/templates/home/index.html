@@ -1,0 +1,284 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="body flex-grow-1 dashboard-modern">
+  <div class="container-fluid px-4 py-4">
+    <div class="dashboard-hero mb-4">
+      <div>
+        <span class="dashboard-eyebrow">TicketFlow Overview</span>
+        <h1 class="dashboard-title mb-2">Dashboard operativo</h1>
+        <p class="dashboard-subtitle mb-0">Resumen real de tickets, clientes y responsables registrados en el sistema.</p>
+      </div>
+      <div class="dashboard-hero-actions">
+        <a href="{{ url_for('home_blueprint.tickets') }}" class="btn btn-dashboard-secondary">Tickets clientes</a>
+        <a href="{{ url_for('home_blueprint.soporte_tickets') }}" class="btn btn-dashboard-primary">
+          <svg class="icon me-2">
+            <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-list"></use>
+          </svg>
+          Mesa soporte
+        </a>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body"><div class="d-flex flex-column flex-lg-row gap-3 justify-content-between align-items-lg-center mb-3"><div><h2 class="h5 mb-1">Indicadores del período</h2><p class="text-medium-emphasis mb-0">Gestión del {{ periodo_inicio.strftime('%d/%m/%Y') }} al {{ periodo_fin.strftime('%d/%m/%Y') }}. El día final no se duplica con el período siguiente.</p></div><form method="get" class="d-flex gap-2"><select class="form-select" name="periodo" aria-label="Período de gestión">{% for periodo in periodos %}<option value="{{ periodo.valor }}" {% if periodo_inicio == periodo.inicio %}selected{% endif %}>{{ periodo.label }}</option>{% endfor %}</select><button class="btn btn-primary" type="submit">Ver período</button></form></div><div class="row g-3 text-center">
+      <div class="col-6 col-lg"><div class="bg-light rounded p-3"><div class="h4 mb-0">{{ gestion_stats.volumen }}</div><small>Ingresados</small></div></div>
+      <div class="col-6 col-lg"><div class="bg-light rounded p-3"><div class="h4 mb-0">{{ gestion_stats.resueltos }}</div><small>Resueltos/cerrados</small></div></div>
+      <div class="col-6 col-lg"><div class="bg-light rounded p-3"><div class="h4 mb-0">{{ '%.2f'|format(gestion_stats.horas) }} h</div><small>Horas efectivas</small></div></div>
+      <div class="col-6 col-lg"><div class="bg-light rounded p-3"><div class="h4 mb-0">${{ '{:,.0f}'.format(gestion_stats.costo) }}</div><small>Costo estimado</small></div></div>
+      <div class="col-6 col-lg"><div class="bg-light rounded p-3"><div class="h4 mb-0">{{ gestion_stats.sla_primera|string + '%' if gestion_stats.sla_primera is not none else '-' }}</div><small>SLA primera atención</small></div></div>
+      <div class="col-6 col-lg"><div class="bg-light rounded p-3"><div class="h4 mb-0">{{ gestion_stats.sla_resolucion|string + '%' if gestion_stats.sla_resolucion is not none else '-' }}</div><small>SLA resolución</small></div></div>
+    </div></div></div>
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-header d-flex justify-content-between align-items-center"><div><h2 class="h5 mb-1">Gestiones por período</h2><p class="text-medium-emphasis mb-0">Selecciona un período para revisar sus tickets.</p></div><a class="btn btn-sm btn-outline-primary" href="{{ url_for('home_blueprint.gobierno_ti') }}">Gobierno TI</a></div><div class="card-body p-0"><div class="table-responsive border-0 rounded-0"><table class="table table-hover"><thead><tr><th>Período</th><th>Recibidos</th><th>Resueltos</th><th>Horas</th><th>Costo estimado</th><th>SLA atención</th><th>SLA resolución</th></tr></thead><tbody>{% for periodo in periodos %}<tr {% if periodo_inicio == periodo.inicio %}class="table-primary"{% endif %}><td><a class="fw-semibold text-decoration-none" href="{{ url_for('home_blueprint.tickets', periodo=periodo.valor) }}">{{ periodo.label }}</a></td><td>{{ periodo.recibidos }}</td><td>{{ periodo.resueltos }}</td><td>{{ '%.2f'|format(periodo.horas) }} h</td><td>${{ '{:,.0f}'.format(periodo.costo) }}</td><td>{{ periodo.sla_primera|string + '%' if periodo.sla_primera is not none else '-' }}</td><td>{{ periodo.sla_resolucion|string + '%' if periodo.sla_resolucion is not none else '-' }}</td></tr>{% endfor %}</tbody></table></div></div></div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-stat-card">
+          <div>
+            <span class="dashboard-stat-label">Total tickets</span>
+            <strong class="dashboard-stat-value">{{ stats.total_tickets }}</strong>
+            <span class="dashboard-stat-note">Clientes y soporte TI</span>
+          </div>
+          <div class="dashboard-stat-icon icon-blue">
+            <svg class="icon">
+              <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-description"></use>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-stat-card">
+          <div>
+            <span class="dashboard-stat-label">Abiertos</span>
+            <strong class="dashboard-stat-value">{{ stats.abiertos }}</strong>
+            <span class="dashboard-stat-note">Ingresados o abiertos</span>
+          </div>
+          <div class="dashboard-stat-icon icon-cyan">
+            <svg class="icon">
+              <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-envelope-open"></use>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-stat-card">
+          <div>
+            <span class="dashboard-stat-label">Pendientes</span>
+            <strong class="dashboard-stat-value">{{ stats.pendientes }}</strong>
+            <span class="dashboard-stat-note">En proceso</span>
+          </div>
+          <div class="dashboard-stat-icon icon-amber">
+            <svg class="icon">
+              <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-sync"></use>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-stat-card">
+          <div>
+            <span class="dashboard-stat-label">Cerrados</span>
+            <strong class="dashboard-stat-value">{{ stats.cerrados }}</strong>
+            <span class="dashboard-stat-note">Finalizados, resueltos o cerrados</span>
+          </div>
+          <div class="dashboard-stat-icon icon-green">
+            <svg class="icon">
+              <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-check-circle"></use>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-xl-8">
+        <div class="dashboard-panel h-100">
+          <div class="dashboard-panel-header">
+            <div>
+              <h2 class="dashboard-panel-title">Ultimos tickets creados</h2>
+              <p class="dashboard-panel-caption">Registros reales combinados de tickets de clientes y soporte TI.</p>
+            </div>
+            <a href="{{ url_for('home_blueprint.tickets', periodo=periodo_inicio.strftime('%Y-%m-%d')) }}" class="btn btn-sm btn-dashboard-secondary">Ver tickets del período</a>
+          </div>
+          <div class="table-responsive dashboard-table-wrap">
+            <table class="table dashboard-table align-middle">
+              <thead>
+                <tr>
+                  <th>Numero</th>
+                  <th>Asunto</th>
+                  <th>Origen</th>
+                  <th>Estado</th>
+                  <th>Prioridad</th>
+                  <th>Responsable</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for ticket in ultimos_tickets %}
+                <tr>
+                  <td>
+                    <a class="dashboard-link" href="{{ ticket.url }}">{{ ticket.numero }}</a>
+                  </td>
+                  <td>
+                    <div class="dashboard-ticket-title">{{ ticket.asunto }}</div>
+                    <div class="dashboard-ticket-meta">{{ ticket.solicitante }}</div>
+                  </td>
+                  <td><span class="dashboard-soft-pill">{{ ticket.origen }}</span></td>
+                  <td>
+                    {% if ticket.estado in ['Ingresado', 'Abierto'] %}
+                    <span class="badge badge-estado-ingresado">{{ ticket.estado }}</span>
+                    {% elif ticket.estado in ['En Proceso', 'En proceso'] %}
+                    <span class="badge badge-estado-proceso">{{ ticket.estado }}</span>
+                    {% elif ticket.estado in ['Finalizado', 'Resuelto', 'Cerrado'] %}
+                    <span class="badge badge-estado-finalizado">{{ ticket.estado }}</span>
+                    {% else %}
+                    <span class="badge bg-secondary">{{ ticket.estado }}</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if ticket.prioridad == 'Baja' %}
+                    <span class="badge badge-prioridad-baja">Baja</span>
+                    {% elif ticket.prioridad == 'Media' %}
+                    <span class="badge badge-prioridad-media">Media</span>
+                    {% elif ticket.prioridad == 'Alta' %}
+                    <span class="badge badge-prioridad-alta">Alta</span>
+                    {% elif ticket.prioridad == 'Critica' %}
+                    <span class="badge badge-prioridad-critica">Critica</span>
+                    {% else %}
+                    <span class="badge bg-secondary">{{ ticket.prioridad }}</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ ticket.responsable }}</td>
+                  <td>{{ ticket.fecha.strftime('%d/%m/%Y') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="7" class="text-center py-4">No hay tickets registrados.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-4">
+        <div class="dashboard-panel mb-3">
+          <div class="dashboard-panel-header compact">
+            <div>
+              <h2 class="dashboard-panel-title">Tickets por estado</h2>
+              <p class="dashboard-panel-caption">Agrupacion real por estado operativo.</p>
+            </div>
+          </div>
+          <div class="dashboard-bars">
+            {% set max_state = state_counts|map(attribute='total')|max if state_counts else 0 %}
+            {% for item in state_counts %}
+            <div class="dashboard-bar-row">
+              <div class="d-flex justify-content-between gap-3">
+                <span>{{ item.label }}</span>
+                <strong>{{ item.total }}</strong>
+              </div>
+              <div class="dashboard-bar-track">
+                <div class="dashboard-bar-fill" style="width: {{ (item.total / max_state * 100) if max_state else 0 }}%"></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="dashboard-panel">
+          <div class="dashboard-panel-header compact">
+            <div>
+              <h2 class="dashboard-panel-title">Prioridades</h2>
+              <p class="dashboard-panel-caption">Clientes y soporte TI.</p>
+            </div>
+          </div>
+          <div class="dashboard-priority-grid">
+            {% for item in priority_counts %}
+            <div class="dashboard-priority-item">
+              <span>{{ item.label }}</span>
+              <strong>{{ item.total }}</strong>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-xl-8">
+        <div class="dashboard-panel">
+          <div class="dashboard-panel-header">
+            <div>
+              <h2 class="dashboard-panel-title">Tendencia de tickets</h2>
+              <p class="dashboard-panel-caption">Tickets de clientes y soporte TI creados durante los ultimos meses.</p>
+            </div>
+          </div>
+          <div class="dashboard-chart">
+            <canvas id="ticketsPorMes" height="120"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-2">
+        <div class="dashboard-mini-card">
+          <span>Clientes activos</span>
+          <strong>{{ stats.clientes_activos }}</strong>
+          <small>Tabla clientes</small>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-2">
+        <div class="dashboard-mini-card">
+          <span>Responsables activos</span>
+          <strong>{{ stats.responsables_activos }}</strong>
+          <small>Admins y tecnicos</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="/static/assets/vendors/chart.js/js/chart.min.js"></script>
+<script>
+  const ticketsChart = document.getElementById('ticketsPorMes');
+  if (ticketsChart) {
+    new Chart(ticketsChart, {
+      type: 'line',
+      data: {
+        labels: {{ chart_labels|tojson }},
+        datasets: [{
+          label: 'Tickets creados',
+          data: {{ chart_values|tojson }},
+          borderColor: '#38bdf8',
+          backgroundColor: 'rgba(56, 189, 248, 0.12)',
+          borderWidth: 2.5,
+          fill: true,
+          tension: 0.35,
+          pointBackgroundColor: '#60a5fa',
+          pointBorderColor: '#0f172a',
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0, color: '#94a3b8' },
+            grid: { color: 'rgba(148, 163, 184, 0.12)' }
+          },
+          x: {
+            ticks: { color: '#94a3b8' },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+</script>
+{% endblock javascripts %}

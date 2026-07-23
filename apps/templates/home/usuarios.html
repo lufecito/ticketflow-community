@@ -1,0 +1,105 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Usuarios{% endblock %}
+
+{% block content %}
+<div class="body flex-grow-1 px-3">
+  <div class="container-lg">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row gap-3 justify-content-between align-items-md-center mb-4">
+      <div>
+        <h1 class="h3 mb-1 text-dark">Usuarios</h1>
+        <p class="text-medium-emphasis mb-0">Gestión de usuarios y permisos del equipo técnico.</p>
+      </div>
+      <a class="btn btn-primary d-inline-flex align-items-center gap-2" href="{{ url_for('home_blueprint.usuario_form') }}">
+        <svg class="icon">
+          <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-plus"></use>
+        </svg>
+        Agregar Usuario
+      </a>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card mb-4 shadow-sm border-0">
+      <div class="card-body p-4">
+        <!-- Search Form -->
+        <form class="row g-2 mb-4" method="get">
+          <div class="col-md-10">
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0 text-muted">
+                <svg class="icon"><use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-search"></use></svg>
+              </span>
+              <input class="form-control bg-light border-start-0" name="buscar" value="{{ buscar }}" placeholder="Buscar por usuario, nombre o correo...">
+            </div>
+          </div>
+          <div class="col-md-2 d-grid">
+            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+          </div>
+        </form>
+
+        <!-- Table -->
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Nombre completo</th>
+                <th>Correo</th>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for usuario in usuarios %}
+              <tr>
+                <td>
+                  <span class="fw-semibold text-dark">
+                    {{ usuario.nombre or '' }} {{ usuario.apellido or '' }}
+                  </span>
+                  {% if not usuario.nombre and not usuario.apellido %}
+                  <span class="text-muted small">- Sin Nombre -</span>
+                  {% endif %}
+                </td>
+                <td><span class="small text-medium-emphasis">{{ usuario.email }}</span></td>
+                <td><span class="fw-semibold text-primary">{{ usuario.username }}</span></td>
+                <td>
+                  {% if usuario.rol == 'Administrador' %}
+                  <span class="badge badge-prioridad-alta">Administrador</span>
+                  {% else %}
+                  <span class="badge badge-prioridad-media">Técnico</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if usuario.activo %}
+                  <span class="badge badge-estado-finalizado">Activo</span>
+                  {% else %}
+                  <span class="badge bg-light text-secondary">Inactivo</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  <div class="d-inline-flex gap-2">
+                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('home_blueprint.usuario_form', usuario_id=usuario.id) }}">
+                      Editar
+                    </a>
+                    <form class="d-inline" method="post" action="{{ url_for('home_blueprint.usuario_eliminar', usuario_id=usuario.id) }}">
+                      <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('¿Estás seguro de eliminar este usuario?')">
+                        Eliminar
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="6" class="text-center text-medium-emphasis py-4">No hay usuarios registrados.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

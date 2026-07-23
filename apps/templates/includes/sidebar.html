@@ -1,0 +1,84 @@
+<div class="sidebar sidebar-dark sidebar-fixed" id="sidebar">
+  <div class="sidebar-brand d-none d-md-flex">
+    <a class="sidebar-brand-full text-white text-decoration-none fs-4 fw-semibold" href="{{ url_for('home_blueprint.index') }}">{{ app_name }}</a>
+    <a class="sidebar-brand-narrow text-white text-decoration-none fs-4 fw-semibold" href="{{ url_for('home_blueprint.index') }}">TF</a>
+  </div>
+  <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
+    {% if current_user.rol in ['Administrador', 'Tecnico'] %}
+    <li class="nav-item">
+      <a class="nav-link {% if segment == 'index' %}active{% endif %}" href="{{ url_for('home_blueprint.index') }}">
+        <svg class="nav-icon">
+          <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-speedometer"></use>
+        </svg> Dashboard
+      </a>
+    </li>
+    {% endif %}
+
+    <li class="nav-item">
+      <a class="nav-link {% if segment == 'soporte_tickets' %}active{% endif %}" href="{{ url_for('home_blueprint.soporte_tickets') }}">
+        <svg class="nav-icon">
+          <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-comment-bubble"></use>
+        </svg> Soporte TI
+      </a>
+    </li>
+
+    {% if current_user.rol in ['Administrador', 'Tecnico'] %}
+    <li class="nav-item">
+      <a class="nav-link {% if segment == 'tickets' %}active{% endif %}" href="{{ url_for('home_blueprint.tickets') }}">
+        <svg class="nav-icon">
+          <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-description"></use>
+        </svg> Tickets Clientes
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if segment == 'tablero_kanban' %}active{% endif %}" href="{{ url_for('home_blueprint.tablero_kanban') }}">
+        <svg class="nav-icon"><use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-columns"></use></svg>
+        Tablero Kanban
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if segment == 'clientes' %}active{% endif %}" href="{{ url_for('home_blueprint.clientes') }}">
+        <svg class="nav-icon">
+          <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-building"></use>
+        </svg> Clientes
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if segment == 'gobierno_ti' %}active{% endif %}" href="{{ url_for('home_blueprint.gobierno_ti') }}">
+        <svg class="nav-icon"><use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-shield-alt"></use></svg> Gobierno TI
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if segment == 'reportes' %}active{% endif %}" href="{{ url_for('home_blueprint.reportes') }}">
+        <svg class="nav-icon"><use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-chart-line"></use></svg> Reportes 15 a 15
+      </a>
+    </li>
+    {% endif %}
+
+    {% if current_user.rol == 'Administrador' %}
+    <li class="nav-item">
+      <a class="nav-link {% if segment == 'usuarios' %}active{% endif %}" href="{{ url_for('home_blueprint.usuarios') }}">
+        <svg class="nav-icon">
+          <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-user"></use>
+        </svg> Usuarios
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if segment == 'configuracion' %}active{% endif %}" href="{{ url_for('home_blueprint.configuracion') }}">
+        <svg class="nav-icon">
+          <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-settings"></use>
+        </svg> Configuracion
+      </a>
+    </li>
+    {% endif %}
+
+    <li class="nav-item mt-auto">
+      <a class="nav-link" href="{{ url_for('authentication_blueprint.logout') }}">
+        <svg class="nav-icon">
+          <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-account-logout"></use>
+        </svg> Salir
+      </a>
+    </li>
+  </ul>
+  <button class="sidebar-toggler" type="button" data-coreui-toggle="unfoldable"></button>
+</div>

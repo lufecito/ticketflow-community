@@ -1,0 +1,15 @@
+services:
+  ticketflow:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      SQLITE_PATH: /data/ticketflow.sqlite3
+      REPORTS_DIR: /data/reports
+    ports:
+      - "5005:5005"
+    volumes:
+      - ticketflow_data:/data
+
+volumes:
+  ticketflow_data:

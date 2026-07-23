@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="{{ app_name }} - Gestión de tickets y operaciones TI">
+    <meta name="author" content="TicketFlow contributors">
+    <title>{{ app_name }} - {% block title %}{% endblock %}</title>
+    <link rel="apple-touch-icon" sizes="57x57" href="/static/assets/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/static/assets/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/static/assets/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/static/assets/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/static/assets/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/assets/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/static/assets/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/assets/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/assets/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/assets/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/static/assets/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/static/assets/favicon/manifest.json">
+    <meta name="theme-color" content="#08111f" id="theme-color-meta">
+    <script>
+      (function () {
+        var saved = localStorage.getItem('ticketflow-theme');
+        var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      }());
+    </script>
+    <link rel="stylesheet" href="/static/assets/vendors/simplebar/css/simplebar.css">
+    <link rel="stylesheet" href="/static/assets/css/vendors/simplebar.css">
+    <link href="/static/assets/css/style.css" rel="stylesheet">
+    <link href="/static/assets/css/custom.css?v=20260721-theme-contrast" rel="stylesheet">
+    {% block stylesheets %}{% endblock stylesheets %}
+  </head>
+  <body>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Activar modo claro" title="Cambiar tema">
+      <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.3 15.3A8.5 8.5 0 0 1 8.7 3.7 8.5 8.5 0 1 0 20.3 15.3Z"/></svg>
+      <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+    {% block content %}{% endblock content %}
+    {% include 'includes/scripts.html' %}
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var button = document.getElementById('theme-toggle');
+        var meta = document.getElementById('theme-color-meta');
+        function applyTheme(theme) {
+          root.setAttribute('data-theme', theme);
+          button.setAttribute('aria-label', theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro');
+          meta.setAttribute('content', theme === 'dark' ? '#08111f' : '#eef4fb');
+        }
+        applyTheme(root.getAttribute('data-theme'));
+        button.addEventListener('click', function () {
+          var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+          localStorage.setItem('ticketflow-theme', next);
+          applyTheme(next);
+        });
+      }());
+    </script>
+    {% block javascripts %}{% endblock javascripts %}
+  </body>
+</html>

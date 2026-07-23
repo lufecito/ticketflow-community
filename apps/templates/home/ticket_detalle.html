@@ -1,0 +1,29 @@
+{% extends "layouts/base.html" %}
+{% block title %}Ticket {{ ticket.numero }}{% endblock %}
+{% block content %}
+<div class="body flex-grow-1 px-3"><div class="container-lg">
+  <div class="d-flex justify-content-between align-items-start mb-4"><div><h1 class="h3 mb-1">{{ ticket.numero }} <span class="badge bg-primary fs-6">{{ ticket.estado }}</span></h1><div class="text-medium-emphasis fs-5">{{ ticket.asunto }}</div></div><div class="d-flex gap-2"><a class="btn btn-outline-primary" href="{{ url_for('home_blueprint.ticket_form', ticket_id=ticket.id) }}">Editar</a><a class="btn btn-outline-secondary" href="{{ url_for('home_blueprint.tickets') }}">Volver</a></div></div>
+  <div class="row"><div class="col-lg-8">
+    <div class="card shadow-sm border-0 mb-4"><div class="card-header fw-semibold">Información general</div><div class="card-body"><div class="row g-3">
+      <div class="col-md-4"><small class="text-medium-emphasis">Cliente</small><div class="fw-semibold">{{ ticket.cliente.nombre }}</div></div>
+      <div class="col-md-4"><small class="text-medium-emphasis">Categoría</small><div class="fw-semibold">{{ ticket.categoria or '-' }}</div></div>
+      <div class="col-md-4"><small class="text-medium-emphasis">Modalidad</small><div class="fw-semibold">{{ ticket.modalidad or '-' }}</div></div>
+      <div class="col-md-4"><small class="text-medium-emphasis">Prioridad</small><div class="fw-semibold">{{ ticket.prioridad }}</div></div>
+      <div class="col-md-4"><small class="text-medium-emphasis">Técnico</small><div class="fw-semibold">{{ ticket.tecnico.username if ticket.tecnico else 'Sin asignar' }}</div></div>
+      <div class="col-md-4"><small class="text-medium-emphasis">Activo relacionado</small><div class="fw-semibold">{{ ticket.activo_referencia or '-' }}</div></div>
+      <div class="col-12 border-top pt-3"><small class="text-medium-emphasis">Descripción e impacto</small><div class="bg-light p-3 rounded mt-1" style="white-space:pre-line">{{ ticket.descripcion or 'Sin descripción.' }}</div></div>
+      <div class="col-md-6"><small class="text-medium-emphasis">Diagnóstico</small><div class="bg-light p-3 rounded mt-1" style="white-space:pre-line">{{ ticket.diagnostico or 'Pendiente.' }}</div></div>
+      <div class="col-md-6"><small class="text-medium-emphasis">Solución</small><div class="bg-light p-3 rounded mt-1" style="white-space:pre-line">{{ ticket.solucion or 'Pendiente.' }}</div></div>
+    </div></div></div>
+    <div class="card shadow-sm border-0 mb-4"><div class="card-header fw-semibold">Comentarios y bitácora</div><div class="card-body"><form method="post" action="{{ url_for('home_blueprint.ticket_comentario', ticket_id=ticket.id) }}" class="mb-4"><textarea class="form-control mb-2" name="comentario" rows="3" required placeholder="Actualización del ticket..."></textarea><button class="btn btn-primary">Agregar comentario</button></form>{% for comentario in ticket.comentarios|sort(attribute='fecha', reverse=True) %}<div class="border rounded p-3 mb-2"><div class="d-flex justify-content-between"><b>{{ comentario.usuario.username }}</b><small>{{ comentario.fecha.strftime('%d/%m/%Y %H:%M') }}</small></div><div style="white-space:pre-line">{{ comentario.comentario }}</div></div>{% else %}<p class="text-medium-emphasis">Sin comentarios.</p>{% endfor %}</div></div>
+  </div><div class="col-lg-4">
+    <div class="card shadow-sm border-0 mb-4"><div class="card-header fw-semibold">SLA y dedicación</div><div class="card-body">
+      <div class="mb-3"><small class="text-medium-emphasis">Primera atención</small><div>{{ ticket.fecha_primera_atencion.strftime('%d/%m/%Y %H:%M') if ticket.fecha_primera_atencion else 'Pendiente' }} {% if ticket.sla_primera_cumplido is sameas true %}<span class="badge bg-success">Cumplido</span>{% elif ticket.sla_primera_cumplido is sameas false %}<span class="badge bg-danger">Incumplido</span>{% endif %}</div></div>
+      <div class="mb-3"><small class="text-medium-emphasis">Resolución</small><div>{{ ticket.fecha_resolucion.strftime('%d/%m/%Y %H:%M') if ticket.fecha_resolucion else 'Pendiente' }} {% if ticket.sla_resolucion_cumplido is sameas true %}<span class="badge bg-success">Cumplido</span>{% elif ticket.sla_resolucion_cumplido is sameas false %}<span class="badge bg-danger">Incumplido</span>{% endif %}</div></div>
+      <div><small class="text-medium-emphasis">Horas efectivas</small><div class="fw-semibold">{{ '%.2f'|format(ticket.horas_efectivas or 0) }} h</div></div>
+    </div></div>
+    <div class="card shadow-sm border-0 mb-4"><div class="card-header fw-semibold">Actualizar estado</div><div class="card-body"><form method="post" action="{{ url_for('home_blueprint.ticket_estado', ticket_id=ticket.id) }}"><select class="form-select mb-3" name="estado">{% for estado in estados %}<option value="{{ estado }}" {% if ticket.estado == estado %}selected{% endif %}>{{ estado }}</option>{% endfor %}</select><button class="btn btn-primary w-100">Guardar estado</button></form></div></div>
+    <div class="card shadow-sm border-0"><div class="card-header fw-semibold">Fechas y validación</div><ul class="list-group list-group-flush small"><li class="list-group-item">Solicitud: {{ (ticket.fecha_solicitud or ticket.fecha_creacion).strftime('%d/%m/%Y %H:%M') }}</li><li class="list-group-item">Actualización: {{ ticket.fecha_actualizacion.strftime('%d/%m/%Y %H:%M') }}</li><li class="list-group-item">Cierre: {{ ticket.fecha_cierre.strftime('%d/%m/%Y %H:%M') if ticket.fecha_cierre else 'Pendiente' }}</li><li class="list-group-item">Validación usuario: {{ 'Sí' if ticket.validacion_usuario else 'No' }}</li></ul></div>
+  </div></div>
+</div></div>
+{% endblock content %}

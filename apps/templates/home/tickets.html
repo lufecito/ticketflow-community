@@ -1,0 +1,165 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Tickets{% endblock %}
+
+{% block content %}
+<div class="body flex-grow-1 px-3">
+  <div class="container-lg">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row gap-3 justify-content-between align-items-md-center mb-4">
+      <div>
+        <h1 class="h3 mb-1 text-dark">Gestión de Tickets</h1>
+        {% if periodo_inicio and periodo_fin %}
+        <p class="text-medium-emphasis mb-0">Tickets recibidos del {{ periodo_inicio.strftime('%d/%m/%Y') }} al {{ periodo_fin.strftime('%d/%m/%Y') }}.</p>
+        {% else %}
+        <p class="text-medium-emphasis mb-0">Administra y haz seguimiento a las incidencias registradas.</p>
+        {% endif %}
+      </div>
+      <a class="btn btn-primary d-inline-flex align-items-center gap-2" href="{{ url_for('home_blueprint.ticket_form') }}">
+        <svg class="icon">
+          <use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-plus"></use>
+        </svg>
+        Nuevo Ticket
+      </a>
+    </div>
+
+    <!-- Filters and Table Card -->
+    <div class="card mb-4 shadow-sm border-0">
+      <div class="card-body p-4">
+        <!-- Filter Form -->
+        <form class="row g-3 mb-4" method="get">
+          {% if filtros.get('periodo') %}<input type="hidden" name="periodo" value="{{ filtros.get('periodo') }}">{% endif %}
+          <div class="col-md-2">
+            <label class="form-label">Buscar Ticket</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0 text-muted">
+                <svg class="icon"><use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-search"></use></svg>
+              </span>
+              <input class="form-control bg-light border-start-0" name="buscar" value="{{ filtros.get('buscar', '') }}" placeholder="Número o asunto...">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Cliente</label>
+            <select class="form-select bg-light" name="cliente_id">
+              <option value="">Todos los clientes</option>
+              {% for cliente in clientes %}
+              <option value="{{ cliente.id }}" {% if filtros.get('cliente_id') == cliente.id|string %}selected{% endif %}>{{ cliente.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Categoría</label>
+            <select class="form-select bg-light" name="categoria"><option value="">Todas</option>{% for categoria in categorias %}<option value="{{ categoria }}" {% if filtros.get('categoria') == categoria %}selected{% endif %}>{{ categoria }}</option>{% endfor %}</select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Estado</label>
+            <select class="form-select bg-light" name="estado">
+              <option value="">Todos los estados</option>
+              {% for estado in estados %}
+              <option value="{{ estado }}" {% if filtros.get('estado') == estado %}selected{% endif %}>{{ estado }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Prioridad</label>
+            <select class="form-select bg-light" name="prioridad">
+              <option value="">Todas</option>
+              {% for prioridad in prioridades %}
+              <option value="{{ prioridad }}" {% if filtros.get('prioridad') == prioridad %}selected{% endif %}>{{ prioridad }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-outline-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2" type="submit">
+              <svg class="icon"><use xlink:href="/static/assets/vendors/@coreui/icons/svg/free.svg#cil-filter"></use></svg>
+              Filtrar
+            </button>
+          </div>
+        </form>
+
+        {% if periodo_inicio and periodo_fin %}
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 rounded border px-3 py-2 mb-4">
+          <span class="small"><strong>Período aplicado:</strong> {{ periodo_inicio.strftime('%d/%m/%Y') }} – {{ periodo_fin.strftime('%d/%m/%Y') }}</span>
+          <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('home_blueprint.tickets') }}">Ver todos los tickets</a>
+        </div>
+        {% endif %}
+
+        <!-- Table -->
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Número</th>
+                <th>Cliente</th>
+                <th>Asunto</th>
+                <th>Categoría</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+                <th>Técnico</th>
+                <th>Fecha</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ticket in tickets %}
+              <tr>
+                <td>
+                  <a class="fw-semibold text-decoration-none text-primary" href="{{ url_for('home_blueprint.ticket_detalle', ticket_id=ticket.id) }}">
+                    {{ ticket.numero }}
+                  </a>
+                </td>
+                <td>{{ ticket.cliente.nombre }}</td>
+                <td><span class="text-dark fw-medium">{{ ticket.asunto }}</span></td>
+                <td><span class="small">{{ ticket.categoria or '-' }}</span></td>
+                <td>
+                  {% if ticket.estado == 'Ingresado' %}
+                  <span class="badge badge-estado-ingresado">Ingresado</span>
+                  {% elif ticket.estado == 'En Proceso' %}
+                  <span class="badge badge-estado-proceso">En Proceso</span>
+                  {% elif ticket.estado == 'Finalizado' %}
+                  <span class="badge badge-estado-finalizado">Finalizado</span>
+                  {% else %}
+                  <span class="badge bg-secondary">{{ ticket.estado }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if ticket.prioridad == 'Baja' %}
+                  <span class="badge badge-prioridad-baja">Baja</span>
+                  {% elif ticket.prioridad == 'Media' %}
+                  <span class="badge badge-prioridad-media">Media</span>
+                  {% elif ticket.prioridad == 'Alta' %}
+                  <span class="badge badge-prioridad-alta">Alta</span>
+                  {% elif ticket.prioridad == 'Critica' %}
+                  <span class="badge badge-prioridad-critica">Crítica</span>
+                  {% else %}
+                  <span class="badge bg-secondary">{{ ticket.prioridad }}</span>
+                  {% endif %}
+                </td>
+                <td><span class="small text-medium-emphasis">{{ ticket.tecnico.username if ticket.tecnico else '-' }}</span></td>
+                <td><span class="small text-medium-emphasis">{{ ticket.fecha_creacion.strftime('%d/%m/%Y') }}</span></td>
+                <td class="text-end">
+                  <div class="d-inline-flex gap-2">
+                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('home_blueprint.ticket_form', ticket_id=ticket.id) }}">
+                      Editar
+                    </a>
+                    <form class="d-inline" method="post" action="{{ url_for('home_blueprint.ticket_eliminar', ticket_id=ticket.id) }}">
+                      <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('¿Estás seguro de eliminar este ticket?')">
+                        Eliminar
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="9" class="text-center text-medium-emphasis py-4">No hay tickets registrados.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

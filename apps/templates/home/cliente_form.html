@@ -1,0 +1,65 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ 'Editar Cliente' if cliente.id else 'Agregar Cliente' }}{% endblock %}
+
+{% block content %}
+<div class="body flex-grow-1 px-3">
+  <div class="container-lg">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="h3 mb-1 text-dark">{{ 'Editar Cliente' if cliente.id else 'Agregar Nuevo Cliente' }}</h1>
+        <p class="text-medium-emphasis mb-0">Llena la información de contacto y facturación del cliente.</p>
+      </div>
+      <a class="btn btn-outline-secondary" href="{{ url_for('home_blueprint.clientes') }}">
+        Volver a la Lista
+      </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card mb-4 shadow-sm border-0">
+      <div class="card-body p-4">
+        <form method="post">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nombre o Razón Social *</label>
+              <input class="form-control" name="nombre" value="{{ cliente.nombre or '' }}" placeholder="Ej: Organización Demo" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">RUT / Identificador</label>
+              <input class="form-control" name="rut" value="{{ cliente.rut or '' }}" placeholder="Ej: 12.345.678-9">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Dirección comercial</label>
+              <input class="form-control" name="direccion" value="{{ cliente.direccion or '' }}" placeholder="Ej: Av. Providencia 1234, Oficina 501">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Ciudad</label>
+              <input class="form-control" name="ciudad" value="{{ cliente.ciudad or '' }}" placeholder="Ej: Santiago">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Teléfono de contacto</label>
+              <input class="form-control" name="telefono" value="{{ cliente.telefono or '' }}" placeholder="Ej: +56 9 1234 5678">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Correo Electrónico</label>
+              <input class="form-control" type="email" name="correo" value="{{ cliente.correo or '' }}" placeholder="Ej: contacto@empresa.cl">
+            </div>
+            <div class="col-12 mt-4">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="activo" id="activo" {% if cliente.activo or not cliente.id %}checked{% endif %}>
+                <label class="form-check-label fw-medium text-dark" for="activo">Cliente Activo</label>
+                <div class="form-text">Los clientes inactivos no aparecerán disponibles para nuevos tickets.</div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 border-top pt-3 d-flex justify-content-end gap-2">
+            <a href="{{ url_for('home_blueprint.clientes') }}" class="btn btn-outline-secondary">Cancelar</a>
+            <button class="btn btn-primary px-4" type="submit">Guardar Cliente</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
